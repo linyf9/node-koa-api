@@ -20,3 +20,7 @@ npm run dev
 
 
 npm install dotenv --save   // dotenv会去根目录下加载.env文件，把文件中的键值对写到环境变量中
+
+
+npm i koa-router
+npm i koa-body
