@@ -41,7 +41,7 @@ npm install dotenv --save   // dotenv会去根目录下加载.env文件，把文
 
 
 npm i koa-router
-npm i koa-body
+npm i koa-body  // 也支持文件上传
 
 
 Sequelize 是一个基于 promise 的 Node.js ORM, 目前支持 Postgres, MySQL, MariaDB, SQLite 以及 Microsoft SQL Server. 它具有强大的事务支持, 关联关系, 预读和延迟加载,读取复制等功能。
@@ -54,3 +54,27 @@ ORM: 对象关系映射(面向对象的方式去操作数据库)
     数据表的操作 对应对象的方法
 npm i sequelize
 npm i mysql2 
+
+
+
+
+密码加密：在插入数据库之前，先把密码加密再存进去
+npm install bcryptjs
+
+
+
+<!-- 身份认证jwt: jsonwebtoken -->
+npm i jsonwebtoken
+
+
+<!-- 配置静态资源访问，将某一个文件夹设置为静态资源访问的文件夹，当我们访问一张图片时，就会去该目录找 -->
+npm i koa-static
+
+
+<!-- 参数验证中间件 -->
+npm i koa-parameter
+
+
+
+
+

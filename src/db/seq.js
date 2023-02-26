@@ -19,5 +19,6 @@ const seq = new Sequelize(MYSQL_DB, MYSQL_USER, MYSQL_PWD, { host: MYSQL_HOST, p
 //     console.log('数据库连接成功！', err);
 // })
 
+// 导出数据库对象 seq
 module.exports = seq
 
