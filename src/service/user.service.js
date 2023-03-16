@@ -30,9 +30,10 @@ class UserService {
         password && Object.assign(whereOpt, { password })
         is_admin && Object.assign(whereOpt, { is_admin })
         const res = await User.findOne({
-            attributes: ['user_id', 'user_name', 'nickname', 'password', 'is_admin'], //设置要查询到的字段
+            attributes: ['user_id', 'user_name', 'nickname', 'password', 'user_avatar','is_admin'], //设置要查询到的字段
             where: whereOpt, //查询条件
         })
+        console.log(res);
         // console.log(res); // Singer.findOne方法查询得到的res是一个对象，res.dataValues为查询到的那条数据
         return res ? res.dataValues : null
     }
@@ -51,6 +52,58 @@ class UserService {
         return res[0] > 0 ? true : false
     }
 
+    // 获取全部用户信息
+    async getAllUsersInfo({ offset = '1', limit = '10' }) {
+        if (offset === '') offset = '1';
+        if (limit === '') limit = '10';
+        const resArr = await User.findAll({
+            order: [['user_id', 'DESC']],
+            offset: (offset-1)*limit,
+            limit: limit*1,
+            attributes: ['user_id', 'user_name', 'nickname','createdAt'],
+        })
+        if (resArr.length > 0) {
+            const users = resArr.filter(item=>item.user_name!=='admin')
+            const usersArr = users.map(user => {
+                let { createdAt } = user.dataValues
+                console.log(createdAt);
+                createdAt = new Date(`${createdAt}`).getTime()
+                console.log(createdAt);
+                user.dataValues = Object.assign(user.dataValues, { createdAt })
+                return user.dataValues
+            })
+            
+            return usersArr
+        }
+        return []
+
+    }
+
+     // 获取用户总数
+    async getAllUserTotal() {
+        const res = await User.findAll({
+            attributes: ['user_id']
+        });
+        return res.length
+    }
+
+
+    // 修改用户名或用户昵称
+    // async updateNameById({ user_id, nickname, user_name }) {
+        
+    // }
+
+    // 删除用户（通过用户的user_id来删除）除
+    async deleteUser(user_id) {
+         const res = await User.destroy({
+            where: {
+                user_id
+            }
+        })
+        // 单一删除，成功就返回数字res=1，然后我们返回出true或false
+        // console.log(res); 
+        return res === 1 ? true : false
+    }
     
 
 }

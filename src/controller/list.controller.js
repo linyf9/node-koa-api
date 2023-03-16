@@ -3,6 +3,15 @@ const fs = require('fs')
 const errType = require('../constant/err.type')
 const { APP_DURL } = require('../config/config.default')
 const listService = require('../service/list.service')
+
+const getAllListTotal = async () =>{
+        try {
+            let total = await listService.getAllListTotal()
+            return total
+        } catch (error) {
+            console.log('获取总数失败');
+        }
+}
 // 歌单 控制器Controller层
 class ListController {
 
@@ -115,14 +124,30 @@ class ListController {
         try {
             const { offset, limit } = ctx.request.query
             const res = await listService.getAllLists({ offset, limit })
+            let total = await getAllListTotal()
             return ctx.body = {
                 code: 200,
                 message: '获取所有歌单数据成功',
+                total,
                 data: res
             }
         } catch (error) {
             console.error('获取所有歌单数据失败', error);
             return ctx.app.emit('error', errType.getAllListError,ctx)
+        }
+    }
+
+    // 获取所有歌单名称 及 id
+    async getLists(ctx, next) {
+        try {
+            const res = await listService.getLists()
+            return ctx.body = {
+                code: 200,
+                message: '获取所有歌单信息(名字及id)成功',
+                data: res
+            }
+        } catch (error) {
+            console.log('获取所有歌单信息(名字及id)失败');
         }
     }
 

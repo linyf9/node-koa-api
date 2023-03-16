@@ -10,11 +10,11 @@ class UploadMiddleware {
         const { user_avatar='' } = ctx.request.files //拿到上传图片的字段,这里有s，表示可以同时上传多张
         // console.log('23456789', ctx.request.files);
         const fileTypes = ['image/jpeg', 'image/png']
-        // 如果没有上传图片
-        if (!user_avatar) {
-            console.error('您没有上传图片', user_avatar);
-            return ctx.app.emit('error', errType.notUploadAvatar, ctx)
-        }
+        // 如果后台没有上传用户头像【改了，头像可以为空，为了配合前台】
+        // if (!user_avatar) {
+        //     console.error('您还没有上传图片', user_avatar);
+        //     return ctx.app.emit('error', errType.notUploadAvatar, ctx)
+        // }
         // 如果图片格式有误就提示错误信息
         if (user_avatar) {
             if (!fileTypes.includes(user_avatar.mimetype)) { //表示不在fileTypes数组中的文件格式
@@ -31,7 +31,7 @@ class UploadMiddleware {
     // 校验 管理员登录 上传歌手头像
     async verifyAdminUpload(ctx, next) {
         // console.log(1);
-        const { singer_avatar='' } = ctx.request.files //拿到上传图片的字段,这里有s，表示可以同时上传多张
+        const { singer_avatar } = ctx.request.files //拿到上传图片的字段,这里有s，表示可以同时上传多张
         // console.log('23456789', ctx.request.files);
         const fileTypes = ['image/jpeg', 'image/png']
         // 如果没有上传图片

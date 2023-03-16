@@ -122,9 +122,9 @@ class SongMiddleware {
 
                 // 根据 song_id 修改歌曲信息
                 if (type === 'put') { 
-                    // 通过 song_id 查看 歌单是否在数据库中
+                    // 通过 song_id 查看 歌曲是否在数据库中
                     const { song_id } = ctx.request.body
-                    const { song_imgpath, song_filepath, song_lycpath } = ctx.request.files
+                    const { song_imgpath='', song_filepath='', song_lycpath='' } = ctx.request.files
                     res = await songService.getSongInfo({ song_id })
                     // 如果之前有这首歌曲，修改信息时，应该先查到该歌曲之前的封面，然后删掉本地之前的封面，换新的了
                     if (res) {

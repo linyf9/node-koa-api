@@ -12,19 +12,19 @@ const router = new KoaRouter({ prefix: '/list' })
 1管理员 上传（添加）歌单
 参数：
 */
-router.post('/', authMiddleware.auth, authMiddleware.hadAdminPermission, listMiddleware.verifyListUpload, listMiddleware.listValidator, listMiddleware.verifylist('post'),listController.addList)
+router.post('/admin/add', authMiddleware.author, authMiddleware.hadAdminPermission, listMiddleware.verifyListUpload, listMiddleware.listValidator, listMiddleware.verifylist('post'),listController.addList)
 
 /*
 2是否登录，是否为管理员  根据歌单id 修改 对应歌单的基本信息（id等这些参数都在body中）
 参数：
 */
-router.put('/', authMiddleware.auth, authMiddleware.hadAdminPermission, listMiddleware.verifyListUpload, listMiddleware.listValidator, listMiddleware.verifylist('put'), listController.updateList)
+router.put('/admin/update', authMiddleware.author, authMiddleware.hadAdminPermission, listMiddleware.verifyListUpload, listMiddleware.listValidator, listMiddleware.verifylist('put'), listController.updateList)
 
 /*
 3管理员 根据歌单id 删除 歌单（参数在ctx.request.params中）删除的同时应该也要把本地图片等资源也删除
 参数：
 */
-router.delete('/:list_id', authMiddleware.auth, authMiddleware.hadAdminPermission, listMiddleware.verifylist('delete'), listController.deleteList)
+router.delete('/admin/delete/:list_id', authMiddleware.author, authMiddleware.hadAdminPermission, listMiddleware.verifylist('delete'), listController.deleteList)
 
 /*
 4简单获取 所有歌单的基本信息(默认是最新创建的那四个歌单)
@@ -42,7 +42,8 @@ router.get('/:list_id', listMiddleware.verifylist('get'), listController.getList
 // 默认展示 第一页的10条数据，之后触底再发请求获取第二页的数据
 router.get('/songs/:list_id', listMiddleware.verifylist('get'), listController.getListSongsById)
 
-
+// 7. 获取所有歌单标题 及 id
+router.get('/all/name/id', listController.getLists)
 
 
 

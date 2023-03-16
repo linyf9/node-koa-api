@@ -30,12 +30,12 @@ class SingerMiddleware {
                 let res
                 // post 通过 判断歌手名字有没有在数据库中，有就不添加，无就添加
                 if (type === 'post') {
-                    const { singer_name, singer_id } = ctx.request.body
+                    const { singer_name } = ctx.request.body
                     const { singer_avatar } = ctx.request.files
                     res = await singerService.getSingerInfo({ singer_name })
                     // console.log(Object.prototype.toString.call(res));
                     if (res) {
-                        console.error('歌手已经存在', singer_name, singer_id);
+                        console.error('歌手已经存在', singer_name);
                         // 歌手已经存在, 不能添加歌手，删除upload中该上传的头像
                         fs.unlinkSync(path.join(__dirname, '../upload', path.basename(singer_avatar.filepath)))
                         return ctx.app.emit('error', errType.singerAlreadyExited, ctx)

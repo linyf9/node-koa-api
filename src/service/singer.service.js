@@ -1,5 +1,5 @@
 // 操作 歌曲模块 数据库 的类 （对数据库数据的增删改查业务）
-const { Op } = require("sequelize");
+const { Op,fn,col } = require("sequelize");
 // 导入 Singer 表类，操作它，它里面有很多方法可以操作该表
 const Singer = require('../model/singer.model')
 const Song = require('../model/song.model')
@@ -127,6 +127,26 @@ class SingerService{
         }
         return []
         
+    }
+
+    // 8.获取歌手总数
+    async getAllSingerTotal() {
+        // 这个更短,并且更不易出错. 如果以后在模型中添加/删除属性,它仍然可以正常工作
+        const res = await Singer.findAll({
+            attributes: ['singer_id']
+        });
+        // console.log(res,'999999');
+        return res.length
+    }
+
+    // 9.获取 所有歌手名称 及 id
+    async getAllSingers() {
+        const res = await Singer.findAll({
+            attributes:['singer_id', 'singer_name']
+        })
+        const resArr = res.map(item => item.dataValues)
+        console.log(resArr);
+        return resArr.length>0 ? resArr : []
     }
 
 }

@@ -32,7 +32,7 @@ const User = seq.define('ff_user', {
     },
     user_avatar: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true, //用户头像可以为空
         comment: '用户头像地址'
     },
     is_admin: {

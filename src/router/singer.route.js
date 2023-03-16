@@ -17,17 +17,21 @@ singer_details
 singer_avatar
 */
 // 增
-router.post('/', authMiddleware.auth, authMiddleware.hadAdminPermission, uploadMiddleware.verifyAdminUpload, singerMiddleware.singerValidator, singerMiddleware.verifySinger('post'), singerController.addSinger)
+// router.post('/', authMiddleware.auth, authMiddleware.hadAdminPermission, uploadMiddleware.verifyAdminUpload, singerMiddleware.singerValidator, singerMiddleware.verifySinger('post'), singerController.addSinger)
+// authMiddleware.author
+router.post('/admin/add', authMiddleware.author, authMiddleware.hadAdminPermission, uploadMiddleware.verifyAdminUpload, singerMiddleware.singerValidator, singerMiddleware.verifySinger('post'), singerController.addSinger)
+// router.post('/admin/add', singerController.addSinger)
 
 // 2. 管理员登录 修改(更新)歌手信息 是否登录，是否管理员，是否上传图片，是否为空，存在就可以修改，不存在就不行
 // 内容不能留空白，一定要全填，不能只填一个
 // 根据歌手id 修改 对应歌手的基本信息
 // 改
-router.put('/', authMiddleware.auth, authMiddleware.hadAdminPermission, uploadMiddleware.verifyAdminUpload, singerMiddleware.singerValidator, singerMiddleware.verifySinger('put'), singerController.updateSinger)
+// router.put('/', authMiddleware.auth, authMiddleware.hadAdminPermission, uploadMiddleware.verifyAdminUpload, singerMiddleware.singerValidator, singerMiddleware.verifySinger('put'), singerController.updateSinger)
+router.put('/admin/update', authMiddleware.author, authMiddleware.hadAdminPermission, uploadMiddleware.verifyAdminUpload, singerMiddleware.singerValidator, singerMiddleware.verifySinger('put'), singerController.updateSinger)
 
 // 3. 管理员登录 删除歌手 通过歌手id删除歌手信息
 // 删
-router.delete('/:singer_id', authMiddleware.auth, authMiddleware.hadAdminPermission, singerMiddleware.verifySinger('delete'), singerController.deleteSinger)
+router.delete('/admin/:singer_id', authMiddleware.author, authMiddleware.hadAdminPermission, singerMiddleware.verifySinger('delete'), singerController.deleteSinger)
 
 // 查
 // 无需登录
@@ -41,6 +45,8 @@ router.get('/:singer_id', singerMiddleware.verifySinger('get'), singerController
 // 6. 根据歌手id获取歌手的全部歌曲（默认获取最新的10条）
 router.get('/songs/:singer_id', singerMiddleware.verifySinger('get'), singerController.getSingerSongsById)
 
+// 7. 获取所有歌手名称 及 id
+router.get('/all/name/id', singerController.getSingers)
 
 
 module.exports = router

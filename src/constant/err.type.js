@@ -39,7 +39,7 @@ module.exports = {
     // 密码不匹配(错误)
     invalidPassword: {
         code: '10006',
-        message: '密码不匹配',
+        message: '密码错误',
         data: ''
     },
     // 修改密码失败
@@ -87,19 +87,24 @@ module.exports = {
         message: '修改用户昵称失败',
         data: ''
     },
+    usernameError: {
+        code: '10015',
+        message: '请输入正确的手机号码格式',
+        data: ''
+    },
 
 
     // 授权模块相关101
     // token过期
     tokenExpiredError: {
         code: '10101',
-        message: 'token已过期',
+        message: 'token已过期，请重新登录',
         data: ''
     },
     // 无效的token
     invalidToken: {
         code: '10102',
-        message: '无效的token',
+        message: '无效的token，请先登录',
         data: ''
     },
     // 没有管理员权限
@@ -175,6 +180,11 @@ module.exports = {
     songNotExitError: {
         code: '10213',
         message: '歌曲不存在',
+        data: ''
+    },
+    getMP3Error: {
+        code: '10214',
+        message: '获取歌曲MP3链接失败',
         data: ''
     },
 

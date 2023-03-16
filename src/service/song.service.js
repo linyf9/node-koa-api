@@ -3,9 +3,10 @@
 const { Op } = require('sequelize')
 const Song = require('../model/song.model')
 const Singer = require('../model/singer.model')
-// const List = require('../model/list.model')
+const List = require('../model/list.model')
 // const Listsong = require('../../test/listsong.model')
 const { readLrc } = require('../utils/read.lrc')
+const load = require('audio-loader')
 class SongService{
     // 1新增歌曲（上传歌曲）
     async addSong(song) {
@@ -61,6 +62,19 @@ class SongService{
         
     }
 
+    // 9根据歌曲id获取MP3
+    async getSongMp3ById(song_id) {
+        let res = await Song.findOne({
+            where: {
+                song_id
+            },
+            attributes: ['song_filepath'],
+        })
+
+        return res ? res.dataValues.song_filepath : ''
+        
+    }
+
     // 5获取单首歌曲信息
     // 可以根据 song_id, song_songname, song_singerid, song_rank 来获取歌曲信息
     async getSongInfo({ song_id, song_songname, song_singerid, song_rank }) {
@@ -83,7 +97,7 @@ class SongService{
         })
         if (res) {
             // 也就是 dataValues 基于获取本表的信息，而 dataValues.ff_singer.dataValues 中存放着关联表的查询信息
-            let { ff_singer = {}, createdAt, updatedAt, ...dataVals } = res.dataValues
+            let { ff_singer = {}, createdAt, updatedAt, song_lycpath,song_filepath, ...dataVals } = res.dataValues
             createdAt = new Date().getTime(createdAt)
             updatedAt = new Date().getTime(createdAt)
             dataVals = Object.assign(dataVals, {
@@ -91,6 +105,13 @@ class SongService{
                 createdAt,
                 updatedAt
             })
+            // let res1 = await load(dataVals.song_filepath)
+            // dataVals.dt = res1.duration*1000
+            // .then(res => {
+            //     // console.log(res.duration*1000);
+            // })
+            // console.log(dataVals.song_filepath);
+            
             return dataVals
         }
         
@@ -118,7 +139,7 @@ class SongService{
         })
         if (res) {
             const songs = res.map(item => {
-                let { ff_singer = {},createdAt,updatedAt, ...song } = item.dataValues
+                let { ff_singer = {},createdAt,updatedAt,song_lycpath,song_filepath, ...song } = item.dataValues
                 song.singer_name = ff_singer.dataValues.singer_name || '无名歌手'
                 createdAt = new Date().getTime(createdAt)
                 updatedAt = new Date().getTime(createdAt)
@@ -153,7 +174,7 @@ class SongService{
 
         if (res) {
             const songs = res.map(item => {
-                let { ff_singer = {},createdAt,updatedAt, ...song } = item.dataValues
+                let { ff_singer = {},createdAt,updatedAt,song_lycpath,song_filepath, ...song } = item.dataValues
                 song.singer_name = ff_singer.dataValues.singer_name || '无名歌手'
                 createdAt = new Date().getTime(createdAt)
                 updatedAt = new Date().getTime(createdAt)
@@ -186,7 +207,7 @@ class SongService{
 
         if (res) {
             const songs = res.map(item => {
-                let { ff_singer = {},createdAt,updatedAt, ...song } = item.dataValues
+                let { ff_singer = {},createdAt,updatedAt,song_lycpath,song_filepath, ...song } = item.dataValues
                 song.singer_name = ff_singer.dataValues.singer_name || '无名歌手'
                 createdAt = new Date().getTime(createdAt)
                 updatedAt = new Date().getTime(createdAt)
@@ -198,6 +219,86 @@ class SongService{
         return []
     }
     
+    // 9. 获取歌曲总数
+    async getAllSongTotal() {
+        const res = await Song.findAll({
+            attributes: ['song_id']
+        });
+        return res.length
+    }
+
+    // 10. 后台获取所有歌曲信息
+    async getAllSongs({ keyword = '', offset = '1', limit = '10' }) {
+        if (offset === '') offset = '1';
+        if (limit === '') limit = '10';
+        const res = await Song.findAll({
+            order: [['song_id', 'DESC']],
+            offset: (offset - 1) * limit,
+            limit: limit * 1,
+            where: {
+                song_songname: {
+                    [Op.substring]: keyword
+                }  
+            },
+            include: [
+                {
+                    attributes: ['singer_name'],
+                    model: Singer,
+                },
+                {
+                    attributes: ['list_title'],
+                    model: List,
+                },
+
+            ]
+        })
+
+        if (res) {
+            const songs = res.map(item => {
+                let { ff_singer = {}, ff_list={}, createdAt, updatedAt, song_lycpath, ...song } = item.dataValues
+                song_lycpath = readLrc(item.dataValues.song_lycpath)
+                song.singer_name = ff_singer.dataValues.singer_name || '无名歌手'
+                song.list_title = (ff_list && ff_list.dataValues && ff_list.dataValues.list_title) || ''
+                createdAt = new Date().getTime(createdAt)
+                updatedAt = new Date().getTime(createdAt)
+                song = Object.assign(song, {...song, createdAt, updatedAt, song_lycpath})
+                return song
+            })
+            return songs
+        }
+        return []
+    }
+
+    // 获取类型的数量
+    async getSongRankAmount() {
+        let res1 = await Song.findAll({
+            where: {
+                song_rank: '每日推荐'
+            }
+        })
+        let res2 = await Song.findAll({
+            where: {
+                song_rank: '热歌榜'
+            }
+        })
+        let res3 = await Song.findAll({
+            where: {
+                song_rank: '飙升榜'
+            }
+        })
+        let res4 = await Song.findAll({
+            where: {
+                song_rank: '中文dj榜'
+            }
+        })
+
+        return {
+            dailyAmount: res1.length,
+            hotAmount: res2.length,
+            upAmount: res3.length,
+            djAmount: res4.length
+        }
+    }
 
 }
 

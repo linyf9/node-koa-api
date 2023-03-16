@@ -2,6 +2,7 @@
 // 导入 List 表类，操作它，它里面有很多方法可以操作该表
 const List = require('../model/list.model')
 const Song = require('../model/song.model')
+const Singer = require('../model/singer.model')
 // const Listsong = require('../../test/listsong.model')
 
 class ListService{
@@ -66,11 +67,24 @@ class ListService{
             limit: +limit,
             where: {
                 song_listid: list_id
-            }
+            },
+            include: [
+                {
+                    attributes: ['singer_name'],
+                    model: Singer,
+                }
+            ]
         })
         if (res.length > 0) {
             const songs = res.map(song => {
-                let { song_lycpath, createdAt, updatedAt, ...data } = song.dataValues
+                // let { ff_singer = {},createdAt,updatedAt,song_lycpath, ...song } = item.dataValues
+                // song.singer_name = ff_singer.dataValues.singer_name || '无名歌手'
+                // createdAt = new Date().getTime(createdAt)
+                // updatedAt = new Date().getTime(createdAt)
+                // song = Object.assign(song, { ...song, createdAt, updatedAt })
+                
+                let { ff_singer = {}, song_lycpath, createdAt, updatedAt, ...data } = song.dataValues
+                data.singer_name = ff_singer.dataValues.singer_name || '无名歌手'
                 createdAt = new Date().getTime(createdAt)
                 updatedAt = new Date().getTime(createdAt)
                 data = Object.assign(data, {...data, createdAt, updatedAt })
@@ -82,11 +96,11 @@ class ListService{
     }
 
     // 获取所有歌单数据，默认获取第一页的三个歌单，推荐歌曲的话就不弄成歌单了，可以在歌单中获取部分歌曲，还有没有被安排进歌单的歌曲，这些就是推荐歌曲
-    async getAllLists({ offset = '1', limit = '3' }) {
+    async getAllLists({ offset = '1', limit = '10' }) {
         if (offset === '') offset = '1';
-        if (limit === '') limit = '3';
+        if (limit === '') limit = '10';
         const resArr = await List.findAll({
-            order: [['list_id', 'DESC']],
+            // order: [['list_id', 'DESC']],
             offset: (offset-1)*limit,
             limit: +limit
         })
@@ -94,7 +108,7 @@ class ListService{
             const lists = resArr.map(list => {
                 let { createdAt, updatedAt } = list.dataValues
                 createdAt = new Date().getTime(createdAt)
-                updatedAt = new Date().getTime(createdAt)
+                updatedAt = new Date().getTime(updatedAt)
                 list.dataValues = Object.assign(list.dataValues, { createdAt, updatedAt })
                 return list.dataValues
             })
@@ -125,6 +139,59 @@ class ListService{
         return null
     }
 
+    // 获取歌单总数
+    async getAllListTotal() {
+        const res = await List.findAll({
+            attributes: ['list_id']
+        });
+        return res.length
+    }
+
+    // 9.获取 所有歌单标题 及 id
+    async getLists() {
+        const res = await List.findAll({
+            attributes:['list_id', 'list_title']
+        })
+        const resArr = res.map(item => item.dataValues)
+        console.log(resArr);
+        return resArr.length>0 ? resArr : []
+    }
+
+
+    async getTitleAndSongs() {
+        const res = await List.findAll({
+            attributes: ['list_id','list_title'],
+        })
+        const listArr = res.map(item=>item.dataValues)
+        console.log(listArr);
+        let arr = []
+        let r = await new Promise((resolve, reject) => {
+            listArr.forEach(async item => {
+                const resArr =  await Song.findAll({
+                    where: {
+                        song_listid: item.list_id
+                    }
+                })
+                arr.push(resArr.length)
+            })
+            setTimeout(() => {
+                resolve(arr)
+            },200)
+        })
+
+
+        for (let i = 0; i < r.length; i++) {
+            
+        }
+
+        const pieData = r.map((item, i) => {
+            return {
+                name: listArr[i].list_title,
+                value: item
+            }
+        })
+        return pieData.length && pieData
+    }
 
 }
 

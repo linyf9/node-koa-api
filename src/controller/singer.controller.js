@@ -3,14 +3,27 @@ const fs = require('fs')
 const errType = require('../constant/err.type')
 const { APP_DURL } = require('../config/config.default')
 const singerService = require('../service/singer.service')
+
+const getAllSingerTotal = async () =>{
+        try {
+            console.log(2222);
+            let total = await singerService.getAllSingerTotal()
+            return total
+        } catch (error) {
+            console.log('获取歌手总数失败');
+        }
+}
 // 歌手 控制器Controller层
 class SingerController {
+    // 获取歌手总数
+    
 
     // 1管理员 添加歌手
     async addSinger(ctx, next) {
         try {
             // 1. 获取数据
-            // console.log('tuyjhsgavc',ctx.request.body);
+            console.log('tuyjhsgavc',ctx.request.body);
+            console.log(ctx.request.files);
             const { singer_name, singer_details } = ctx.request.body
             let { singer_avatar } = ctx.request.files
             singer_avatar = APP_DURL + path.basename(singer_avatar.filepath)
@@ -119,15 +132,31 @@ class SingerController {
             let { keyword, offset, limit } = ctx.request.query
             const res = await singerService.getAllSinger({ keyword,offset,limit })
             // 如果返回的是空数组，则报歌手不存在的提示
-            if(res.length === 0) return ctx.app.emit('error', errType.singerNotExitError, ctx)
+            if (res.length === 0) return ctx.app.emit('error', errType.singerNotExitError, ctx)
+            let total = await getAllSingerTotal()
             return ctx.body = {
                 code: 200,
                 message: '获取全部歌手信息成功',
+                total,
                 data: res
             }
         } catch (error) {
             console.error('获取全部歌手信息失败', error);
             return ctx.app.emit('error', errType.getSingerError, ctx)
+        }
+    }
+
+    // 获取所有歌手名称 及 id
+    async getSingers(ctx, next) {
+        try {
+            const res = await singerService.getAllSingers()
+            return ctx.body = {
+                code: 200,
+                message: '获取所有歌手信息(名字及id)成功',
+                data: res
+            }
+        } catch (error) {
+            console.log('获取所有歌手信息(名字及id)失败');
         }
     }
 
