@@ -1,6 +1,7 @@
 // 用户 服务Service层
 // 操作 用户模块 数据库 的类 （对数据库数据的增删改查业务）
 // 导入 User 数据库表ff_users模型类，里面就封装了大量的操作数据库的方法（是插入语句、查询语句等的简写封装）
+const { Op } = require('sequelize')
 const User = require('../model/user.model')
 class UserService {
     // 为什么要加上async呢，因为数据库操作是异步的
@@ -53,14 +54,19 @@ class UserService {
     }
 
     // 获取全部用户信息
-    async getAllUsersInfo({ offset = '1', limit = '10' }) {
+    async getAllUsersInfo({keyword = '', offset = '1', limit = '10' }) {
         if (offset === '') offset = '1';
         if (limit === '') limit = '10';
         const resArr = await User.findAll({
             order: [['user_id', 'DESC']],
-            offset: (offset-1)*limit,
+            offset: (offset*1-1)*limit,
             limit: limit*1,
-            attributes: ['user_id', 'user_name', 'nickname','createdAt'],
+            attributes: ['user_id', 'user_name', 'nickname', 'createdAt'],
+            where: {
+                nickname: {
+                    [Op.substring]: keyword
+                }  
+            }
         })
         if (resArr.length > 0) {
             const users = resArr.filter(item=>item.user_name!=='admin')
@@ -84,6 +90,22 @@ class UserService {
         const res = await User.findAll({
             attributes: ['user_id']
         });
+        return res.length
+    }
+
+    // 根据关键词获取用户数量
+    async getAllUserOfKeywordTotal(keyword) {
+        // 这个更短,并且更不易出错. 如果以后在模型中添加/删除属性,它仍然可以正常工作
+        const res = await User.findAll({
+            where: {
+                nickname: {
+                    [Op.substring]: keyword
+                }
+            },
+            attributes: ['user_id']
+        });
+        // console.log(res, '763454553');
+        
         return res.length
     }
 

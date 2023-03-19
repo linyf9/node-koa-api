@@ -1,5 +1,6 @@
 // 操作 歌单模块 数据库 的类 （对数据库数据的增删改查业务）
 // 导入 List 表类，操作它，它里面有很多方法可以操作该表
+const { Op } = require('sequelize')
 const List = require('../model/list.model')
 const Song = require('../model/song.model')
 const Singer = require('../model/singer.model')
@@ -96,13 +97,18 @@ class ListService{
     }
 
     // 获取所有歌单数据，默认获取第一页的三个歌单，推荐歌曲的话就不弄成歌单了，可以在歌单中获取部分歌曲，还有没有被安排进歌单的歌曲，这些就是推荐歌曲
-    async getAllLists({ offset = '1', limit = '10' }) {
+    async getAllLists({ keyword = '',  offset = '1', limit = '10' }) {
         if (offset === '') offset = '1';
         if (limit === '') limit = '10';
         const resArr = await List.findAll({
             // order: [['list_id', 'DESC']],
             offset: (offset-1)*limit,
-            limit: +limit
+            limit: +limit,
+            where: {
+                list_title: {
+                    [Op.substring]: keyword
+                }
+            }
         })
         if (resArr.length > 0) {
             const lists = resArr.map(list => {
@@ -191,6 +197,21 @@ class ListService{
             }
         })
         return pieData.length && pieData
+    }
+
+
+    // 根据关键词获取歌单数量
+    async getAllListOfKeywordTotal(keyword) {
+        const res = await List.findAll({
+            where: {
+                list_title: {
+                    [Op.substring]: keyword
+                }
+            },
+            attributes: ['list_id']
+        });
+        console.log(res, '763454553');
+        return res.length
     }
 
 }

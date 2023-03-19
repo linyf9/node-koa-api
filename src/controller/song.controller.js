@@ -301,8 +301,17 @@ class SongController {
             let { keyword, offset, limit } = ctx.request.query
             const res = await songService.getAllSongs({ keyword, offset, limit })
             // 如果返回的是空数组，则报歌曲不存在的提示
-            if (res.length === 0) return ctx.app.emit('error', errType.songNotExitError, ctx)
+            if (res.length === 0) { 
+                return ctx.body = {
+                    code: 5001,
+                    message: '暂无歌曲信息',
+                    data: ''
+                }
+            } 
             let total = await getAllSongTotal()
+            if (keyword) {
+                total = await songService.getAllSongOfKeywordTotal(keyword)
+            }
             return ctx.body = {
                 code: 200,
                 message: '获取全部歌曲信息成功',

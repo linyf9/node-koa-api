@@ -28,7 +28,7 @@ router.delete('/admin/delete/:list_id', authMiddleware.author, authMiddleware.ha
 
 /*
 4简单获取 所有歌单的基本信息(默认是最新创建的那四个歌单)
-参数：
+参数：可以关键词模糊查询
 */
 router.get('/', listController.getAllLists)
 

@@ -45,7 +45,7 @@ router.post('/admin/update', authMiddleware.author, userMiddleware.frontverifyUs
 // 8. 删除用户
 router.delete('/admin/delete/:user_id',authMiddleware.author,userController.deleteUser)
 
-// 9. 获取所有用户信息（除了管理员）
+// 9. 后台获取所有用户信息（除了管理员）
 router.get('/all', userController.getAllUsers)
 
 

@@ -269,10 +269,29 @@ class UserController {
     // 获取所有用户信息（除了管理员）
     async getAllUsers(ctx, next) {
         try {
-            const { offset, limit } = ctx.request.query
-            const res = await userService.getAllUsersInfo({ offset, limit })
-            console.log(res);
+            const { keyword, offset, limit } = ctx.request.query
+            
+            const res = await userService.getAllUsersInfo({ keyword, offset, limit })
+            // console.log(res);
+             // 如果返回的是空数组，则报歌曲不存在的提示
+            if (res.length === 0) { 
+                return ctx.body = {
+                    code: 5003,
+                    message: '暂无用户信息',
+                    data: ''
+                }
+            }
             let total = await getAllUserTotal()
+            if (keyword) {
+                total = await userService.getAllUserOfKeywordTotal(keyword)
+                return ctx.body = {
+                    code: 200,
+                    message: '获取全部用户信息成功',
+                    total: total,
+                    data: res
+                }
+            }
+
             return ctx.body = {
                 code: 200,
                 message: '获取全部用户信息成功',
@@ -280,7 +299,7 @@ class UserController {
                 data: res
             }
         } catch (error) {
-             console.error('获取全部用户信息失败');
+             console.error('获取全部用户信息失败',error);
         }
     }
 

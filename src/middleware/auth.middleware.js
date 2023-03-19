@@ -48,22 +48,39 @@ class AuthMiddleware {
     async author(ctx, next) {
         const { cookie = '' } = ctx.header //如果没传authorization，就给authorization一个默认值
         console.log(ctx.header.cookie, '9999999');
-        // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInVzZXJfYXZhdGFyIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwLzZjN2Q4YjY4NTcxZTczMmI2OTQ0ZjBkMDAuanBnIiwiaXNfYWRtaW4iOnRydWUsImlhdCI6MTY3ODk0OTIwOSwiZXhwIjoxNjc5NTU0MDA5fQ.KP-FgBDbV0QgiBP19uqbZCpnDjZlkqx08BdbAxIl71E
-        const cookieList = cookie.split('=')
-        // console.log(cookieList[1]);
-        // cookieList[1].replace('Bearer ', '')
-        let token = cookieList[1].replace('Bearer ', '')
+        // SECKEY_ABVK=1MV2L03szKwrz52mToO9h4r3iJ9vpfvStCpqoG16fEo%3D; BMAP_SECKEY=1MV2L03szKwrz52mToO9h2zdXX6pkF-HRm6Apr2bA5fleUhbg2d7VoCf1Ocu18yAKSVZ4eAt2pjj6lViCFFzmBiVPWsNM5Sf6TJFZ2Vg14serYzODBnUmsGh1HvXNQnBO2cbYhORQ0N57f037ozrumYz_bTWrDS19QYCXi3_Z2qHw09NFFJ9ZeiREY4z7phb; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbiIsInVzZXJfYXZhdGFyIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwLzZjN2Q4YjY4NTcxZTczMmI2OTQ0ZjBkMDAuanBnIiwiaXNfYWRtaW4iOnRydWUsImlhdCI6MTY3OTAxOTA4NywiZXhwIjoxNjc5NjIzODg3fQ.6qjdZZQwJeLjklAsUqOiIJWa7w5rCd93c_66uueigKA
+        const cookieList1 = cookie.split('; ')
+        console.log(cookieList1, '9876545678');
+        let token = ''
+        cookieList1.some(item => {
+            let arr = item.split('=');
+            if (arr.indexOf('token') !== -1) {
+                console.log(arr,'66666');
+                let i = arr.indexOf('token')
+                console.log(i, '00000');
+                token=arr[i+1].replace('Bearer ', '')
+            }
+        });
+        console.log(token,'77777');
+        
+        // const cookieList = cookie.split('=')
+        
+        // if (cookieList.indexOf('token') !== -1) {
+        //     let i = cookieList.indexOf('token')
+        //     console.log(i,'123456');
+        //     token = cookieList[i+1].replace('Bearer ', '')
+        // }
         // console.log(token, '000000');
-        let tokenList = []
-        if (token.indexOf(';') !== -1) {
-            console.log(token.indexOf(';'));
-            tokenList = token.split(';')
-            token = tokenList[0]
-            console.log(token,'000');
-        } else {
-            token = cookieList[1].replace('Bearer ', '')
-            console.log(token,'777');
-        }
+        // let tokenList = []
+        // if (token.indexOf(';') !== -1) {
+        //     console.log(token.indexOf(';'));
+        //     tokenList = token.split(';')
+        //     token = tokenList[0]
+        //     console.log(token,'000');
+        // } else {
+        //     token = cookieList[1].replace('Bearer ', '')
+        //     console.log(token,'777');
+        // }
         
         try {
             // 会拿到payload部分（id, username, is_admin）

@@ -106,8 +106,8 @@ class SingerService{
         }
         const res = await Singer.findAll({
             order: [['singer_id','DESC']],
-            offset: (offset - 1)*limit, //表示跳过的数量，所以这里应该乘上limit来表示第几页的数据
-            limit: +limit,
+            offset: (offset*1 - 1)*limit, //表示跳过的数量，所以这里应该乘上limit来表示第几页的数据
+            limit: limit*1,
             where: {
                 singer_name: {
                     [Op.substring]: keyword
@@ -147,6 +147,20 @@ class SingerService{
         const resArr = res.map(item => item.dataValues)
         console.log(resArr);
         return resArr.length>0 ? resArr : []
+    }
+
+    // 根据关键词获取歌手数量
+    async getAllSingerOfKeywordTotal(keyword) {
+        // 这个更短,并且更不易出错. 如果以后在模型中添加/删除属性,它仍然可以正常工作
+        const res = await Singer.findAll({
+            where: {
+                singer_name: {
+                    [Op.substring]: keyword
+                }
+            },
+            attributes: ['singer_id']
+        });
+        return res.length
     }
 
 }

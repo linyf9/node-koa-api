@@ -122,9 +122,20 @@ class ListController {
     // 6获取 所有歌单基本信息
     async getAllLists(ctx, next) {
         try {
-            const { offset, limit } = ctx.request.query
-            const res = await listService.getAllLists({ offset, limit })
+            const { keyword, offset, limit } = ctx.request.query
+            const res = await listService.getAllLists({ keyword, offset, limit })
+            // 如果返回的是空数组，则报歌单不存在的提示
+            if (res.length === 0) { 
+                return ctx.body = {
+                    code: 5004,
+                    message: '暂无歌单信息',
+                    data: ''
+                }
+            }
             let total = await getAllListTotal()
+            if (keyword) {
+                total = await listService.getAllListOfKeywordTotal(keyword)
+            }
             return ctx.body = {
                 code: 200,
                 message: '获取所有歌单数据成功',

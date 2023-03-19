@@ -252,8 +252,7 @@ class SongService{
 
             ]
         })
-
-        if (res) {
+        if (res.length>0) {
             const songs = res.map(item => {
                 let { ff_singer = {}, ff_list={}, createdAt, updatedAt, song_lycpath, ...song } = item.dataValues
                 song_lycpath = readLrc(item.dataValues.song_lycpath)
@@ -298,6 +297,22 @@ class SongService{
             upAmount: res3.length,
             djAmount: res4.length
         }
+    }
+
+    // 根据关键词获取歌曲数量
+    async getAllSongOfKeywordTotal(keyword) {
+        // 这个更短,并且更不易出错. 如果以后在模型中添加/删除属性,它仍然可以正常工作
+        const res = await Song.findAll({
+            where: {
+                song_songname: {
+                    [Op.substring]: keyword
+                }
+            },
+            attributes: ['song_id']
+        });
+        console.log(res, '763454553');
+        
+        return res.length
     }
 
 }

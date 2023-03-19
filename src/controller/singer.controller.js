@@ -13,6 +13,15 @@ const getAllSingerTotal = async () =>{
             console.log('获取歌手总数失败');
         }
 }
+// const getAllSingerOfKeywordTotal = async () =>{
+//         try {
+//             console.log(2222);
+//             let total = await singerService.getAllSingerOfKeywordTotal()
+//             return total
+//         } catch (error) {
+//             console.log('获取歌手总数失败');
+//         }
+// }
 // 歌手 控制器Controller层
 class SingerController {
     // 获取歌手总数
@@ -132,8 +141,19 @@ class SingerController {
             let { keyword, offset, limit } = ctx.request.query
             const res = await singerService.getAllSinger({ keyword,offset,limit })
             // 如果返回的是空数组，则报歌手不存在的提示
-            if (res.length === 0) return ctx.app.emit('error', errType.singerNotExitError, ctx)
+            if (res.length === 0) { 
+                // return ctx.app.emit('error', errType.singerNotExitError, ctx)
+                return ctx.body = {
+                    code: 5002,
+                    message: '暂无歌手信息',
+                    data: ''
+                }
+            } 
             let total = await getAllSingerTotal()
+            if (keyword) {
+                total = await singerService.getAllSingerOfKeywordTotal(keyword)
+            }
+            
             return ctx.body = {
                 code: 200,
                 message: '获取全部歌手信息成功',
